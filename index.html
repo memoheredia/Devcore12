@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Recordatorio de Clases</title>
+
+<style>
+body {
+    font-family: Arial;
+    background: #020617;
+    color: white;
+    padding: 20px;
+}
+
+h1 {
+    text-align: center;
+    color: #facc15;
+}
+
+.container {
+    max-width: 600px;
+    margin: auto;
+    background: #0f172a;
+    padding: 20px;
+    border-radius: 10px;
+}
+
+input, select, button {
+    width: 100%;
+    padding: 10px;
+    margin-top: 10px;
+    border-radius: 5px;
+    border: none;
+}
+
+button {
+    background: #facc15;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.clase {
+    margin-top: 10px;
+    padding: 10px;
+    background: #1e293b;
+    border-radius: 5px;
+    display: flex;
+    justify-content: space-between;
+}
+</style>
+
+</head>
+<body>
+
+<h1>📚 Recordatorio de Clases</h1>
+
+<div class="container">
+
+<input type="text" id="materia" placeholder="Nombre de la clase">
+<input type="time" id="hora">
+
+<select id="dia">
+    <option>Lunes</option>
+    <option>Martes</option>
+    <option>Miércoles</option>
+    <option>Jueves</option>
+    <option>Viernes</option>
+</select>
+
+<button onclick="agregarClase()">Agregar Clase</button>
+
+<div id="lista"></div>
+
+</div>
+
+<script>
+
+let clases = JSON.parse(localStorage.getItem("clases")) || [];
+
+function mostrarClases() {
+    const lista = document.getElementById("lista");
+    lista.innerHTML = "";
+
+    clases.forEach((c, i) => {
+        lista.innerHTML += `
+            <div class="clase">
+                <span>${c.materia} - ${c.dia} ${c.hora}</span>
+                <button onclick="eliminar(${i})">❌</button>
+            </div>
+        `;
+    });
+}
+
+function agregarClase() {
+    let materia = document.getElementById("materia").value;
+    let hora = document.getElementById("hora").value;
+    let dia = document.getElementById("dia").value;
+
+    if(materia === "" || hora === "") {
+        alert("Completa todos los campos");
+        return;
+    }
+
+    clases.push({materia, hora, dia});
+    localStorage.setItem("clases", JSON.stringify(clases));
+
+    mostrarClases();
+}
+
+function eliminar(i) {
+    clases.splice(i, 1);
+    localStorage.setItem("clases", JSON.stringify(clases));
+    mostrarClases();
+}
+
+function verificarHora() {
+    let ahora = new Date();
+    let horaActual = ahora.getHours().toString().padStart(2,"0") + ":" +
+                     ahora.getMinutes().toString().padStart(2,"0");
+
+    let dias = ["Domingo","Lunes","Martes","Miércoles","Jueves","Viernes","Sábado"];
+    let diaActual = dias[ahora.getDay()];
+
+    clases.forEach(c => {
+        if(c.hora === horaActual && c.dia === diaActual) {
+            alert("📚 Tienes clase de " + c.materia);
+        }
+    });
+}
+
+setInterval(verificarHora, 60000);
+
+mostrarClases();
+
+</script>
+
+</body>
+</html>
